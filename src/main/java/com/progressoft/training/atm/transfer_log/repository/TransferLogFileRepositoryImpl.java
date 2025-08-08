@@ -1,4 +1,6 @@
-package com.progressoft.training.atm.repositories;
+package com.progressoft.training.atm.transfer_log.repository;
+
+import com.progressoft.training.atm.bank.service.request.TransferRequest;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -14,16 +16,17 @@ public class TransferLogFileRepositoryImpl implements TransferLogFileRepository 
     }
 
 
-    public void addTransfer(String senderPin, String receiverPin, BigDecimal amount) {
+    @Override
+    public void addTransfer(TransferRequest transferRequest) {
 
-        String castedAmount = amount.toString();
+        String castedAmount = transferRequest.amount().toString();
 
-        String str = senderPin + " Transfers " + castedAmount + " JOD to " + receiverPin;
+        String str = transferRequest.senderPin() + " Transfers " + castedAmount + " JOD to " + transferRequest.receiverPin();
 
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath, true));
 
-            bufferedWriter.write(str+ "\n");
+            bufferedWriter.write(str + "\n");
 
             System.out.print(str);
 

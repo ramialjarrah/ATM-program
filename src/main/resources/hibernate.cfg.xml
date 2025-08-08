@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- Set the schema generation strategy -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- Database connection properties -->
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/atm_machine_project</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">RamiJarrah123!</property>
+
+        <!-- Specify the dialect for MySQL -->
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+
+        <!-- Entity mappings -->
+        <mapping class="com.progressoft.training.atm.bank.repository.entities.UserEntity"/>
+        <mapping class="com.progressoft.training.atm.atm_machine.repository.entities.CashEntity"/>
+
+
+    </session-factory>
+</hibernate-configuration>
