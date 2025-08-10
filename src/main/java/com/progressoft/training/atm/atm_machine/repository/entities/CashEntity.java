@@ -19,9 +19,11 @@ public class CashEntity {
     private UUID cashID;
 
     @Column(name = "CASH_NAME", unique = true)
+    @NonNull
     private String cashName;
 
     @Column(name = "CASH_COUNT", unique = true)
+    @NonNull
     private BigDecimal cashCount;
 
     @Column(name = "CASH_QUANTITY")
