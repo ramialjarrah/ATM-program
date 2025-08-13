@@ -40,11 +40,11 @@ class AtmServiceImplTest {
     void setUp() {
         this.atmService = new AtmServiceImpl(bankService, atmRepository);
         fakeCashes = new ArrayList<>(List.of(
-                new CashDomain(UUID.randomUUID(),"FiftyDinars", BigDecimal.valueOf(50), 50),
-                new CashDomain(UUID.randomUUID(),"TwentyDinars", BigDecimal.valueOf(20),50),
-                new CashDomain(UUID.randomUUID(), "TenDinars", BigDecimal.valueOf(10),50),
-                new CashDomain(UUID.randomUUID(),"FiveDinars", BigDecimal.valueOf(5), 50),
-                new CashDomain(UUID.randomUUID(),"OneDinar", BigDecimal.valueOf(1), 50)
+                new CashDomain(UUID.randomUUID().toString(),"FiftyDinars", BigDecimal.valueOf(50), 50),
+                new CashDomain(UUID.randomUUID().toString(),"TwentyDinars", BigDecimal.valueOf(20),50),
+                new CashDomain(UUID.randomUUID().toString(), "TenDinars", BigDecimal.valueOf(10),50),
+                new CashDomain(UUID.randomUUID().toString(),"FiveDinars", BigDecimal.valueOf(5), 50),
+                new CashDomain(UUID.randomUUID().toString(),"OneDinar", BigDecimal.valueOf(1), 50)
         ));
     }
 
@@ -63,9 +63,9 @@ class AtmServiceImplTest {
     void givenCorrectCategoriesAndPin_whenCallingDeposit_thenDeposit() {
 
         Map<CashDomain,Integer> cashDomains = new HashMap<>(Map.of(
-                new CashDomain(UUID.randomUUID(), "FiftyDinars", BigDecimal.valueOf(50), 1),1,
-                new CashDomain(UUID.randomUUID(), "FiveDinars", BigDecimal.valueOf(5), 1),1,
-                new CashDomain(UUID.randomUUID(), "OneDinar", BigDecimal.valueOf(1), 1), 5
+                new CashDomain(UUID.randomUUID().toString(), "FiftyDinars", BigDecimal.valueOf(50), 1),1,
+                new CashDomain(UUID.randomUUID().toString(), "FiveDinars", BigDecimal.valueOf(5), 1),1,
+                new CashDomain(UUID.randomUUID().toString(), "OneDinar", BigDecimal.valueOf(1), 1), 5
         ));
         String pin = "12345";
         DepositRequest depositRequestAtm = new DepositRequest(pin, cashDomains);
@@ -74,7 +74,7 @@ class AtmServiceImplTest {
         for(Map.Entry<CashDomain,Integer> entry : depositRequestAtm.cashDomains().entrySet()){
             CashDomain cashDomain = entry.getKey();
             int quantity = entry.getValue();
-            totalAmount = totalAmount.add(cashDomain.getCashCount().multiply(BigDecimal.valueOf(quantity)));
+            totalAmount = totalAmount.add(cashDomain.getCashAmount().multiply(BigDecimal.valueOf(quantity)));
             cashDomain.setCashQuantity(cashDomain.getCashQuantity()+(quantity));
         }
         atmService.deposit(depositRequestAtm);
@@ -90,7 +90,7 @@ class AtmServiceImplTest {
 
         Mockito.when(atmRepository.getActualAmount()).thenReturn(new BigDecimal("500"));
 
-        Mockito.when(atmRepository.sortCashCategory()).thenReturn(fakeCashes);
+        Mockito.when(atmRepository.listCashCategories()).thenReturn(fakeCashes);
         atmService.withdraw(withdrawRequestAtm);
 
         Mockito.verify(bankService).withdraw(new com.progressoft.training.atm.bank.service.request.WithdrawRequest(withdrawRequestAtm.pin(), withdrawRequestAtm.amount()));
@@ -111,9 +111,9 @@ class AtmServiceImplTest {
     void givenWrongAmountOrPin_whenCallingDeposit_thenDeposit() {
 
         Map<CashDomain,Integer> cashDomains = new HashMap<>(Map.of(
-                new CashDomain(UUID.randomUUID(), "FiftyDinars", BigDecimal.valueOf(50), 1),1,
-                new CashDomain(UUID.randomUUID(), "FiveDinars", BigDecimal.valueOf(5), 1),1,
-                new CashDomain(UUID.randomUUID(), "OneDinar", BigDecimal.valueOf(1), 1), 5
+                new CashDomain(UUID.randomUUID().toString(), "FiftyDinars", BigDecimal.valueOf(50), 1),1,
+                new CashDomain(UUID.randomUUID().toString(), "FiveDinars", BigDecimal.valueOf(5), 1),1,
+                new CashDomain(UUID.randomUUID().toString(), "OneDinar", BigDecimal.valueOf(1), 1), 5
         ));
         String pin = "12345";
 

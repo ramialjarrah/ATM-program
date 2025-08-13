@@ -6,13 +6,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface AtmRepository {
-    void saveCategory(CashDomain cashDomain);
 
     void updateCategory(CashDomain cashDomain);
 
-    List<CashDomain> retrieveCashes();
-
-    List<CashDomain> sortCashCategory();
+    List<CashDomain> listCashCategories();
 
     BigDecimal getActualAmount();
+
+    CashDomain getCashById(String cashId);
 }

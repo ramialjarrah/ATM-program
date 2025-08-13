@@ -1,7 +1,7 @@
 package com.progressoft.training.atm;
 
-import com.progressoft.training.atm.atm_machine.mapper.CashEntityDomainMapper;
-import com.progressoft.training.atm.atm_machine.mapper.CashEntityDomainMapperImpl;
+import com.progressoft.training.atm.atm_machine.mapper.CashMapper;
+import com.progressoft.training.atm.atm_machine.mapper.CashMapperImpl;
 import com.progressoft.training.atm.atm_machine.repository.AtmRepository;
 import com.progressoft.training.atm.atm_machine.repository.AtmRepositoryImpl;
 import com.progressoft.training.atm.atm_machine.service.AtmService;
@@ -10,8 +10,8 @@ import com.progressoft.training.atm.atm_machine.service.domain.CashDomain;
 import com.progressoft.training.atm.atm_machine.service.request.DepositRequest;
 import com.progressoft.training.atm.atm_machine.service.request.TransferRequest;
 import com.progressoft.training.atm.atm_machine.service.request.WithdrawRequest;
-import com.progressoft.training.atm.bank.mapper.UserEntityDomainMapper;
-import com.progressoft.training.atm.bank.mapper.UserEntityDomainMapperImpl;
+import com.progressoft.training.atm.bank.mapper.UserMapper;
+import com.progressoft.training.atm.bank.mapper.UserMapperImpl;
 import com.progressoft.training.atm.bank.repository.BankRepository;
 import com.progressoft.training.atm.bank.repository.BankRepositoryImpl;
 import com.progressoft.training.atm.bank.service.BankService;
@@ -28,8 +28,8 @@ import java.util.*;
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
-    CashEntityDomainMapper cashEntityDomainMapper;
-    UserEntityDomainMapper userEntityDomainMapper;
+    CashMapper cashEntityDomainMapper;
+    UserMapper userEntityDomainMapper;
     AtmRepository atmRepository;
     AtmService atmService;
     SessionFactory sessionFactory;
@@ -40,8 +40,8 @@ public class Main {
 
 
     public Main() {
-        this.cashEntityDomainMapper = new CashEntityDomainMapperImpl();
-        this.userEntityDomainMapper = new UserEntityDomainMapperImpl();
+        this.cashEntityDomainMapper = new CashMapperImpl();
+        this.userEntityDomainMapper = new UserMapperImpl();
         sessionFactory = new Configuration().configure().buildSessionFactory();
         session = sessionFactory.openSession();
         this.atmRepository = new AtmRepositoryImpl(cashEntityDomainMapper, session);
@@ -54,6 +54,7 @@ public class Main {
     public static void main(String[] args) {
         Main mm = new Main();
         mm.start();
+
     }
 
     void start() {
@@ -88,7 +89,7 @@ public class Main {
     private String logIn() {
         System.out.print("Please enter your pin to Login: ");
         String pin = scanner.nextLine();
-        UserDomain userDomain = atmService.findUserByPin(pin);
+        UserDomain userDomain = bankService.getUserByPin(pin);
         System.out.println("Welcome to ATM machine " + userDomain.getUsername() + "!");
         System.out.println("Your balance is: " + userDomain.getBalance() + " JOD");
 
@@ -139,9 +140,9 @@ public class Main {
     }
 
     private void printCashes() {
-        List <CashDomain> cashes = atmService.retrieveCashes();
+        List <CashDomain> cashes = atmService.ListCashCategories();
         for (CashDomain cashDomain : cashes) {
-            System.out.println(cashDomain.getCashID()+" " + cashDomain.getCashCount() + " JOD");
+            System.out.println(cashDomain.getCashID()+" " + cashDomain.getCashAmount() + " JOD");
         }
     }
 }

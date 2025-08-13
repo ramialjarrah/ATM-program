@@ -4,10 +4,10 @@ import com.progressoft.training.atm.atm_machine.service.domain.CashDomain;
 import com.progressoft.training.atm.atm_machine.service.request.DepositRequest;
 import com.progressoft.training.atm.atm_machine.service.request.TransferRequest;
 import com.progressoft.training.atm.atm_machine.service.request.WithdrawRequest;
-import com.progressoft.training.atm.bank.service.domain.UserDomain;
 import com.progressoft.training.atm.exceptions.ValidationException;
 import com.progressoft.training.atm.atm_machine.repository.AtmRepository;
 import com.progressoft.training.atm.bank.service.BankService;
+import com.progressoft.training.atm.util.validators.BeanValidator;
 
 import java.math.BigDecimal;
 
@@ -27,20 +27,21 @@ public class AtmServiceImpl implements AtmService {
 
     @Override
     public void deposit(DepositRequest depositRequest) {
-        if (depositRequest.cashDomains() == null || depositRequest.pin() == null) {
-            throw new ValidationException("amount and pin cannot be null!");
-        }
+
+        BeanValidator.validate(depositRequest);
+
         BigDecimal totalAmount = calculateAmountFromCategories(depositRequest);
         bankService.deposit(new com.progressoft.training.atm.bank.service.request.DepositRequest(totalAmount, depositRequest.pin()));
     }
 
     private BigDecimal calculateAmountFromCategories(DepositRequest depositRequest) {
         BigDecimal totalAmount = BigDecimal.ZERO;
-        for(Map.Entry<CashDomain,Integer> entry : depositRequest.cashDomains().entrySet()){
+
+        for (Map.Entry<CashDomain, Integer> entry : depositRequest.cashDomains().entrySet()) {
             CashDomain cashDomain = entry.getKey();
             int quantity = entry.getValue();
-            totalAmount = totalAmount.add(cashDomain.getCashCount().multiply(BigDecimal.valueOf(quantity)));
-            cashDomain.setCashQuantity(cashDomain.getCashQuantity()+(quantity));
+            totalAmount = totalAmount.add(cashDomain.getCashAmount().multiply(BigDecimal.valueOf(quantity)));
+            cashDomain.setCashQuantity(cashDomain.getCashQuantity() + (quantity));
             atmRepository.updateCategory(cashDomain);
         }
         return totalAmount;
@@ -49,15 +50,14 @@ public class AtmServiceImpl implements AtmService {
     @Override
     public void withdraw(WithdrawRequest withdrawRequest) {
 
-        if (withdrawRequest.amount() == null || withdrawRequest.pin() == null) {
-            throw new ValidationException("amount and pin cannot be null!");
-        }
+        BeanValidator.validate(withdrawRequest);
+
         if (withdrawRequest.amount().compareTo(atmRepository.getActualAmount()) > 0) {
             throw new ValidationException("Amount in the ATM is less than the amount you want to withdraw!");
         }
 
-        Map<CashDomain,Integer> dispenseCategories = calculateDispenseCategories(withdrawRequest.amount());
-        for(Map.Entry<CashDomain,Integer> entry : dispenseCategories.entrySet()){
+        Map<CashDomain, Integer> dispenseCategories = calculateDispenseCategories(withdrawRequest.amount());
+        for (Map.Entry<CashDomain, Integer> entry : dispenseCategories.entrySet()) {
             CashDomain cashDomain = entry.getKey();
             int quantity = entry.getValue();
             cashDomain.setCashQuantity(cashDomain.getCashQuantity() - quantity);
@@ -66,14 +66,15 @@ public class AtmServiceImpl implements AtmService {
         bankService.withdraw(new com.progressoft.training.atm.bank.service.request.WithdrawRequest(withdrawRequest.pin(), withdrawRequest.amount()));
     }
 
-    private Map<CashDomain,Integer> calculateDispenseCategories(BigDecimal amount) {
-        Map<CashDomain,Integer> dispenseCategories = new HashMap<>();
-        List<CashDomain> sortedCategories = atmRepository.sortCashCategory();
+    private Map<CashDomain, Integer> calculateDispenseCategories(BigDecimal amount) {
+        Map<CashDomain, Integer> dispenseCategories = new HashMap<>();
+        List<CashDomain> sortedCategories = atmRepository.listCashCategories();
+
         BigDecimal remainingAmount = amount;
         for (CashDomain cashDomain : sortedCategories) {
 
             int availableCategories = cashDomain.getCashQuantity();
-            BigDecimal denomination = cashDomain.getCashCount();
+            BigDecimal denomination = cashDomain.getCashAmount();
             int neededCategories = remainingAmount.divide(denomination, 0, RoundingMode.DOWN).intValue();
             int categoriesToDispense = Math.min(neededCategories, availableCategories);
 
@@ -101,34 +102,21 @@ public class AtmServiceImpl implements AtmService {
 
     @Override
     public void transfer(TransferRequest transferRequest) {
-        if (transferRequest.amount() == null || transferRequest.senderPin() == null || transferRequest.receiverPin() == null) {
-            throw new ValidationException("amount and sender and receiver pin cannot be null!");
-        }
+        BeanValidator.validate(transferRequest);
         bankService.transfer(new com.progressoft.training.atm.bank.service.request.TransferRequest(transferRequest.amount(), transferRequest.senderPin(), transferRequest.receiverPin()));
     }
 
     @Override
-    public List<CashDomain> retrieveCashes() {
-        return atmRepository.retrieveCashes();
+    public List<CashDomain> ListCashCategories() {
+
+        return atmRepository.listCashCategories();
     }
 
     @Override
     public CashDomain getCashById(String cashId) {
-        List<CashDomain> cashDomains = atmRepository.retrieveCashes();
-        for (CashDomain cashDomain : cashDomains) {
-            if (cashDomain.getCashID().toString().equals(cashId)) {
-                return cashDomain;
-            }
-        }
-        throw new ValidationException("No cash found with id: "+cashId);
+
+        return atmRepository.getCashById(cashId);
     }
 
-    @Override
-    public UserDomain findUserByPin(String pin){
-        if(pin == null){
-            throw new ValidationException("pin cannot be null!");
-        }
 
-        return bankService.getUserByPin(pin);
-    }
 }

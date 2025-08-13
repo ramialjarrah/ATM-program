@@ -4,15 +4,8 @@ import com.progressoft.training.atm.bank.repository.entities.UserEntity;
 import com.progressoft.training.atm.bank.service.domain.UserDomain;
 import org.mapstruct.Mapper;
 
-import java.util.List;
-
 @Mapper
-public interface UserEntityDomainMapper {
-    UserEntity userDomainToEntity(UserDomain userDomain);
+public interface UserMapper {
 
     UserDomain userEntityToDomain(UserEntity userEntity);
-
-    List<UserDomain> userEntityToDomainList(List<UserEntity> userEntities);
-
-    List<UserEntity> userDomainToEntityList(List<UserDomain> userDomains);
 }

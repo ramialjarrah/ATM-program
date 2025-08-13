@@ -6,7 +6,6 @@ import com.progressoft.training.atm.bank.service.request.DepositRequest;
 import com.progressoft.training.atm.bank.service.request.TransferRequest;
 import com.progressoft.training.atm.bank.service.request.WithdrawRequest;
 import com.progressoft.training.atm.exceptions.ValidationException;
-import com.progressoft.training.atm.transfer_log.repository.TransferLogFileRepositoryImpl;
 import com.progressoft.training.atm.bank.repository.BankRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,8 +27,6 @@ class BankServiceImplTest {
 
     @Mock
     private BankRepository bankRepository;
-    @Mock
-    private TransferLogFileRepositoryImpl transferLogFileRepository;
     @InjectMocks
     private BankServiceImpl bankService;
 

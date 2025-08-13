@@ -1,6 +1,25 @@
 package com.progressoft.training.atm.atm_machine.service.request;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
 import java.math.BigDecimal;
 
-public record TransferRequest(BigDecimal amount, String senderPin, String receiverPin) {
+@NotNull(message = "TransferRequest cannot be null")
+public record TransferRequest(
+
+        @NotNull(message = "Amount cannot be null")
+        @Positive(message = "Amount must be positive")
+        BigDecimal amount,
+
+        @NotEmpty(message = "Sender PIN cannot be null or empty")
+        @Size(min = 4, max = 4, message = "PIN must be 4 digits")
+        String senderPin,
+
+        @NotEmpty(message = "Receiver PIN cannot be null or empty")
+        @Size(min = 4, max = 4, message = "PIN must be 4 digits")
+        String receiverPin
+) {
 }
